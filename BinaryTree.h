@@ -15,6 +15,40 @@ private:
         Node* right;
     } Node;
 
+    Info &operator = (Info inf){
+        Info Demo;
+        Demo.key = inf.key;
+        Demo.item = inf.item;
+        return Demo;
+    }
+    Info* &operator = (Info* inf){
+        Info* Demo;
+        Demo->key = inf->key;
+        Demo->item = inf->item;
+        return Demo;
+    }
+    Node &operator = (Node nde){
+        Node Demo;
+        Demo.info = nde.info;
+        Demo.right = nde.right;
+        Demo.left = nde.left;
+        return Demo;
+    }
+    Node* &operator = (Node* nde){
+        Node* Demo;
+        Demo->info = nde->info;
+        Demo->right = nde->right;
+        Demo->left = nde->left;
+        return Demo;
+    }
+
+    /*
+    BinaryTree<T, K>* &operator = (Node* tree) {
+        this->root = tree;
+        return *this;
+    }
+     */
+
     Node* root;
 
     void DeleteElementFirst(Node* temp, Node* temparent){
@@ -62,13 +96,8 @@ private:
             RoundTree(tree->right); //Рекурсивная функция для правого поддерева
         }
     }
-public:
-    class WrongKey{};
-
-    BinaryTree(){
-        root = nullptr;
-    }
-    Node* AddNote(K key, T item, Node* tree){
+    /*
+    Node* addnoteREC(K key, T item, Node* tree){
         if (tree == nullptr){
             tree = new Node;
             tree->info.key = key;
@@ -76,13 +105,62 @@ public:
             tree->left = nullptr;
             tree->right = nullptr;
         }else if (key < tree->info.key)
-            tree->left = AddNote(key, item, tree->left);
+            tree->left = addnoteREC(key, item, tree->left);
         else if (key == tree->info.key)
             throw WrongKey();
         else
-            tree->right = AddNote(key, item, tree->right);
+            tree->right = addnoteREC(key, item, tree->right);
         return tree;
     }//добавление узла в бинарное дерево, tree - указатель на корень в самом начале
+     */
+public:
+    class WrongKey{};
+
+    BinaryTree(){
+        root = nullptr;
+    }
+    explicit BinaryTree(Node* newroot){
+        root = newroot;
+    }
+
+    /*
+    void AddNote(K key, T item){
+        Node* newroot = root;
+        newroot = addnoteREC(key, item, root);
+        root = newroot;
+    }
+    */
+
+    void AddNote(K key, T item){
+        Node *par = root;
+        Node *ptr = root;
+
+        auto newnode = new Node;
+        newnode->info.key = key;
+        newnode->info.item = item;
+        newnode->left = nullptr;
+        newnode->right = nullptr;
+
+
+        if(ptr == nullptr)
+            root = newnode;
+        else {
+            while (ptr != nullptr) {
+                if (key < ptr->info.key) {
+                    par = ptr;
+                    ptr = ptr->left;
+                } else if (key > ptr->info.key) {
+                    par = ptr;
+                    ptr = ptr->right;
+                }
+            }
+            if (key < par->info.key)
+                par->left = newnode;
+            else
+                par->right = newnode;
+        }
+    }
+
     Node* GetRoot(){
         return root;
     }
@@ -154,8 +232,8 @@ public:
                 DeleteElementThird(temp);
         }
     }//Удаляет узел с этим ключом
-    BinaryTree<T, K>* GetTree(K key){
-        Node* temp = new Node;
+    BinaryTree<T, K> GetTree(K key){
+        Node* temp;
         Node* search = nullptr;
         temp = root;
         while(temp != nullptr && search == nullptr){
@@ -168,15 +246,14 @@ public:
         }
 
         if (search != nullptr){
-            BinaryTree<T, K>* newtree;
-            newtree->root = search;
+            BinaryTree<T, K> newtree (search);
             return newtree;
         }else
             throw WrongKey();
     }//поддерево по ключу
-    DynamicArray<Info*>* RoundTree(Node* tree){
+    DynamicArray<Info>* RoundTree(Node* tree){
         tree = root;
-        DynamicArray<Info*>* arr;
+        DynamicArray<Info>* arr;
 
         RoundTree(tree, arr);
         return arr;
@@ -185,8 +262,9 @@ public:
         if (searched.root == nullptr)
             return 0;
         if (ContainElement(searched.root->info.key) == 1){
-            BinaryTree<T, K> mbtree = new BinaryTree<T, K>;
-            mbtree.root = this->GetTree(searched.root->info.key);//здесь лежит уменьшенное исходное дерево, дальнеший поиск ведется в нем
+            BinaryTree<T, K> mbtree;
+            mbtree = this->GetTree(searched.root->info.key);
+            //mbtree.root = this->GetTree(searched.root->info.key);//здесь лежит уменьшенное исходное дерево, дальнеший поиск ведется в нем
 
             DynamicArray<Info*>* arrsearched = RoundTree(searched.root);
             int temp = 1;
@@ -206,22 +284,18 @@ public:
     }//Вхождение дерева
 
     void Balancing(){
-        DynamicArray<Info*>* arr = RoundTree(root);
-
-        Node* newroot = arr[arr->GetFilled()/2];
+        DynamicArray<Info>* arr =RoundTree(root);
+        BinaryTree<T, K> newtree;
+        Node* newroot =  arr->GetElement(arr->GetFilled()/2);
+        newtree.root = newroot;
         for(int i = 0; i < arr->GetFilled(); i++){
             if (i == arr->GetFilled()/2)
                 continue;
 
-            newroot = this->AddNote((arr->GetElement(i)).key, (arr->GetElement(i)).item, newroot);
+            newtree.AddNote((arr->GetElement(i)).key, (arr->GetElement(i)).item);
         }
-        //вставить функцию удаления дерева
-        root = newroot;
-    }
-
-    BinaryTree<T, K> &operator = (Node* tree) {
-        this->root = tree;
-        return *this;
+        //удаление дерева
+        root = newtree.GetRoot();
     }
 
 };

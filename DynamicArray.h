@@ -59,6 +59,38 @@ public:
             size = 0;
             return;
         }// удаление массива
+
+        if (newSize == size){return;}// длина не изменится
+
+        if (newSize < size){
+            T *new_array = new T[newSize];
+            for (int i = 0; i < newSize; i++){
+                new_array[i] = array[i];
+            }
+            delete[] array;
+            size = newSize;
+            if (filled > newSize){filled = newSize;}
+            array = new_array;
+            return;
+        }// укорачивание массива
+
+        if (newSize > 0 && size == 0){
+            T *new_array = new T[newSize];
+            delete[] array;
+            size = newSize;
+            array = new_array;
+        }//увеличение размера массива 0 длины
+
+        if (newSize > size){
+            T *new_array = new T[newSize];
+            for (int i = 0; i < filled; i++){
+                new_array[i] = array[i];
+            }
+            delete[] array;
+            size = newSize;
+            array = new_array;
+            return;
+        }// увеличение длины
     };
     int GetSize(){
         return size;

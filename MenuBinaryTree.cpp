@@ -41,7 +41,7 @@ void inputBinaryTreeTyped(DynamicArray<BinaryTree<T, K>> *Arr){
         cout << "Введите значение находящееся в \"" << i << "\" узле дерева" << endl;
         cin >> item;
 
-        addingTree = addingTree.AddNote(key, item, addingTree.GetRoot());
+        addingTree.AddNote(key, item);
     }
 
     Arr->Append(addingTree);
@@ -87,7 +87,7 @@ void functionBinaryTreeTyped(DynamicArray<BinaryTree<T, K>> *Arr){
             cin >> item;
 
             newtree = Arr->GetElement(indexOfTree1);
-            newtree = newtree.AddNote(key, item, newtree.GetRoot());
+            newtree.AddNote(key, item);
             Arr->Append(newtree);
             break;
         case 2:
@@ -106,20 +106,19 @@ void functionBinaryTreeTyped(DynamicArray<BinaryTree<T, K>> *Arr){
             break;
         case 4:
             newtree = Arr->GetElement(indexOfTree1);
-            newtree.Balancing();
+            //newtree.Balancing(); дддддддддоооооооооооддддддеееелллллаааааатттттттттьььььььь
             Arr->Append(newtree);
             break;
         case 5:
             cout << "Введите ключ, который бдует являться корнем извлекаемого дерева:" << endl;
             cin >> key;
 
-            newtree = *(Arr->GetElement(indexOfTree1).GetTree(key));
-            Arr->Append(newtree);
+            Arr->Append(Arr->GetElement(indexOfTree1).GetTree(key));
             break;
         case 6:
             newtree = Arr->GetElement(indexOfTree1);
             newtree2 = Arr->GetElement(indexOfTree2);
-            bol = newtree.ContainTree(newtree2);
+            //bol = newtree.ContainTree(newtree2); ддддддддддооооооооооодддддддддееееееееееееееллллллллллаааааааааатттттттттьььььььь
 
             if (bol == 1)
                 cout << "Это дерево ЯВЛЯЕТСЯ поддеревом исходного!!!" << endl;
@@ -132,15 +131,60 @@ void functionBinaryTreeTyped(DynamicArray<BinaryTree<T, K>> *Arr){
 
     if (function == 1 || function == 3 || function == 4 || function == 5){
         BinaryTree<T, K> resulttree = Arr->GetElement(Arr->GetFilled() - 1);
-        cout << resulttree << endl;
+
+        int variant;
+        cout << "Выберете тип вывода дерева: \n"
+             << "\t1: Как массив\n"
+             << "\t2: Как дерево\n"
+             << "Введите число: ";
+        cin >> variant;
+
+        switch (variant){
+            case 1:
+                PrintBinaryTreeMassive(resulttree);
+                break;
+            case 2:
+                PrintBinaryTreeBeauty(resulttree, 2);
+                break;
+            default:
+                break;
+        }
     }
 }
 
+template<class T, class K>
+void outputBinaryTreeTyped(DynamicArray<BinaryTree<T, K>> * Arr){
+    int amountOfBinaryTree = Arr->GetFilled();
+    int index, variant;
+    cout << "В памяти находится \"" << amountOfBinaryTree << "\" деревьев" << endl;
+    cout << "Выберете индекс дерева, которое хотите вывести" << endl;
+    cin >> index;
+
+    cout << "Выберете тип вывода дерева: \n"
+         << "\t1: Как массив\n"
+         << "\t2: Как дерево\n"
+         << "Введите число: ";
+    cin >> variant;
+
+    if (index < 0 || index >= amountOfBinaryTree)
+        variant = 0;
+
+    switch (variant) {
+        case 1:
+            PrintBinaryTreeMassive(Arr->GetElement(index));
+            break;
+        case 2:
+            PrintBinaryTreeBeauty(Arr->GetElement(index), 2);
+            break;
+        default:
+            break;
+    }
+}
 
 void MenuBinaryTree(){
     auto *intArr = new DynamicArray<BinaryTree<int, int>>;
     auto *floatArr = new DynamicArray<BinaryTree<float, float>>;
-    auto *complexArr = new DynamicArray<BinaryTree<int, complex<int>>>;
+    auto *complexArr = new DynamicArray<BinaryTree<complex<int>, int>>;
 
     int operation;
     while(true){
@@ -158,7 +202,7 @@ void MenuBinaryTree(){
         switch(operation){
             case 1: InputAndSaveBinaryTree(intArr, floatArr, complexArr); break;
             case 2: FunctionWithBinaryTree(intArr, floatArr, complexArr); break;
-            case 3: outputMatrix(intArr, floatArr, complexArr); break;
+            case 3: OutputBinaryTree(intArr, floatArr, complexArr); break;
             default: break;
         }
     }
@@ -166,7 +210,7 @@ void MenuBinaryTree(){
 
 void InputAndSaveBinaryTree(DynamicArray<BinaryTree<int, int>> *intArr,
                             DynamicArray<BinaryTree<float, float>> *floatArr,
-                            DynamicArray<BinaryTree<int, complex<int>>> *complexArr){
+                            DynamicArray<BinaryTree<complex<int>, int>> *complexArr){
     int type = chooseTypeBinaryTree();
 
     switch(type){
@@ -179,7 +223,7 @@ void InputAndSaveBinaryTree(DynamicArray<BinaryTree<int, int>> *intArr,
 
 void FunctionWithBinaryTree(DynamicArray<BinaryTree<int, int>> *intArr,
                             DynamicArray<BinaryTree<float, float>> *floatArr,
-                            DynamicArray<BinaryTree<int, complex<int>>> *complexArr){
+                            DynamicArray<BinaryTree<complex<int>, int>> *complexArr){
     int type = chooseTypeBinaryTree();
 
     switch(type){
@@ -190,5 +234,17 @@ void FunctionWithBinaryTree(DynamicArray<BinaryTree<int, int>> *intArr,
     }
 }
 
+void OutputBinaryTree(DynamicArray<BinaryTree<int, int>> *intArr,
+                      DynamicArray<BinaryTree<float, float>> *floatArr,
+                      DynamicArray<BinaryTree<complex<int>, int>> *complexArr){
+    int type = chooseTypeBinaryTree();
 
+
+    switch (type){
+        case 1:outputBinaryTreeTyped(intArr); break;
+        case 2:outputBinaryTreeTyped(floatArr); break;
+        case 3:outputBinaryTreeTyped(complexArr); break;
+        default: break;
+    }
+}
 
