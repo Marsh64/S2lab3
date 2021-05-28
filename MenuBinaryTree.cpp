@@ -106,7 +106,7 @@ void functionBinaryTreeTyped(DynamicArray<BinaryTree<T, K>> *Arr){
             break;
         case 4:
             newtree = Arr->GetElement(indexOfTree1);
-            //newtree.Balancing(); дддддддддоооооооооооддддддеееелллллаааааатттттттттьььььььь
+            newtree.Balancing();
             Arr->Append(newtree);
             break;
         case 5:
@@ -118,7 +118,7 @@ void functionBinaryTreeTyped(DynamicArray<BinaryTree<T, K>> *Arr){
         case 6:
             newtree = Arr->GetElement(indexOfTree1);
             newtree2 = Arr->GetElement(indexOfTree2);
-            //bol = newtree.ContainTree(newtree2); ддддддддддооооооооооодддддддддееееееееееееееллллллллллаааааааааатттттттттьььььььь
+            bol = newtree.ContainTree(newtree2);
 
             if (bol == 1)
                 cout << "Это дерево ЯВЛЯЕТСЯ поддеревом исходного!!!" << endl;
@@ -185,6 +185,7 @@ void MenuBinaryTree(){
     auto *intArr = new DynamicArray<BinaryTree<int, int>>;
     auto *floatArr = new DynamicArray<BinaryTree<float, float>>;
     auto *complexArr = new DynamicArray<BinaryTree<complex<int>, int>>;
+
 
     int operation;
     while(true){

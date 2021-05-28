@@ -90,29 +90,14 @@ private:
             DeleteElementSecond(nxttemp, nxttemparent);
     }
     void RoundTree(Node* tree, DynamicArray<Info>* arr){
-        if (tree != nullptr) { //Пока не встретится пустой узел
-            RoundTree(tree->left); //Рекурсивная функция для левого поддерева
-            arr->Append(&tree->info);
-            RoundTree(tree->right); //Рекурсивная функция для правого поддерева
+        if (tree != nullptr) {
+            RoundTree(tree->left, arr);
+            arr->Append(tree->info);
+            RoundTree(tree->right, arr);
         }
     }
-    /*
-    Node* addnoteREC(K key, T item, Node* tree){
-        if (tree == nullptr){
-            tree = new Node;
-            tree->info.key = key;
-            tree->info.item = item;
-            tree->left = nullptr;
-            tree->right = nullptr;
-        }else if (key < tree->info.key)
-            tree->left = addnoteREC(key, item, tree->left);
-        else if (key == tree->info.key)
-            throw WrongKey();
-        else
-            tree->right = addnoteREC(key, item, tree->right);
-        return tree;
-    }//добавление узла в бинарное дерево, tree - указатель на корень в самом начале
-     */
+
+
 public:
     class WrongKey{};
 
@@ -122,14 +107,6 @@ public:
     explicit BinaryTree(Node* newroot){
         root = newroot;
     }
-
-    /*
-    void AddNote(K key, T item){
-        Node* newroot = root;
-        newroot = addnoteREC(key, item, root);
-        root = newroot;
-    }
-    */
 
     void AddNote(K key, T item){
         Node *par = root;
@@ -184,7 +161,7 @@ public:
         }else
             throw WrongKey();
     }//Поиск элемента по ключу
-    int ContainElement(K key){
+    bool ContainElement(K key){
         Node* temp = new Node;
         Node* search = nullptr;
         temp = root;
@@ -198,9 +175,9 @@ public:
         }
 
         if (search != nullptr)
-            return 1;
+            return true;
         else
-            return 0;
+            return false;
     }//Вхождение элемента
     void DeleteElement(K key){
         Node* temp = new Node;
@@ -233,7 +210,7 @@ public:
         }
     }//Удаляет узел с этим ключом
     BinaryTree<T, K> GetTree(K key){
-        Node* temp;
+        Node* temp = new Node;
         Node* search = nullptr;
         temp = root;
         while(temp != nullptr && search == nullptr){
@@ -251,48 +228,108 @@ public:
         }else
             throw WrongKey();
     }//поддерево по ключу
-    DynamicArray<Info>* RoundTree(Node* tree){
-        tree = root;
-        DynamicArray<Info>* arr;
-
-        RoundTree(tree, arr);
-        return arr;
+    DynamicArray<Info>& RoundTree(){
+        auto* arr = new DynamicArray<Info>;
+        RoundTree(root, arr);
+        return *arr;
     }
-    int ContainTree(BinaryTree<T, K> searched){
-        if (searched.root == nullptr)
+
+    int isTree(const BinaryTree<T, K>& tree){
+        if (root == tree.root)
+            return 1;
+
+        if (root == nullptr || tree.root == nullptr)
             return 0;
-        if (ContainElement(searched.root->info.key) == 1){
+
+        if (root->info.key != tree.root->info.key || root->info.item != tree.root->info.item)
+            return 0;
+
+        if (not(BinaryTree<T, K>(root->left).isTree(BinaryTree<T, K>(tree.root->left))))
+            return 0;
+
+        if (not(BinaryTree<T, K>(root->right).isTree(BinaryTree<T, K>(tree.root->right))))
+            return 0;
+
+        return 1;
+    }//Сравнивает дерево
+
+    int ContainTree(const BinaryTree<T, K>& tree){
+        if (tree.root == nullptr)
+            return 1;
+
+        if (root == tree.root)
+            return 1;
+
+        if (root == nullptr)
+            return 0;
+
+        if (root->info.key == tree.root->info.key)
+            return isTree(tree);
+
+        if (tree.root->info.key < root->info.key)
+            return BinaryTree<T, K>(root->left).ContainTree(tree);
+        else
+            return BinaryTree<T, K>(root->right).ContainTree(tree);
+    }
+
+    /*
+    int ContainTree(BinaryTree<T, K> tree, BinaryTree<T, K> searched){
+        if (searched.root == nullptr)
+            return 1;
+        if (tree.root == nullptr)
+            return 0;
+
+        if (ContainElement(searched.root->info.key)){
             BinaryTree<T, K> mbtree;
-            mbtree = this->GetTree(searched.root->info.key);
-            //mbtree.root = this->GetTree(searched.root->info.key);//здесь лежит уменьшенное исходное дерево, дальнеший поиск ведется в нем
+            mbtree = tree.GetTree(searched.root->info.key);
+            //mbtree = this->GetTree(searched.root->info.key);
 
-            DynamicArray<Info*>* arrsearched = RoundTree(searched.root);
+            DynamicArray<Info> arrsearched;
+            arrsearched = searched.RoundTree();
+
             int temp = 1;
-            for (int i = 0; i < arrsearched->GetFilled(); i++){
-                temp *= mbtree.ContainElement((arrsearched->GetElement(i))->key);//TODO в чем беда???????
+            for (int i = 0; i < arrsearched.GetFilled(); i++){
+                temp *= mbtree.ContainElement(arrsearched.GetElement(i).key);
 
-                if (&(mbtree.SearchElement((arrsearched->GetElement(i)).key)) != arrsearched->GetElement(i).item)
-                    temp = 0;
+                if (mbtree.ContainElement(arrsearched.GetElement(i).key))
+                    if(*(mbtree.SearchElement(arrsearched.GetElement(i).key)) != arrsearched.GetElement(i).item)
+                        temp = 0;
 
                 if (temp == 0)
                     break;
             }
 
+            BinaryTree<T, K> treeLeft (tree.root->left);
+            BinaryTree<T, K> treeRight (tree.root->right);
+            BinaryTree<T, K> searchedLeft (searched.root->left);
+            BinaryTree<T, K> searchedRight (searched.root->right);
+
+            temp *= ContainTree(treeLeft, searchedLeft);
+            temp *= ContainTree(treeRight, searchedRight);
+
             return temp;
         }else
             return 0;
-    }//Вхождение дерева
+    }//Вхождение дерева (не работает до конца)
+    */
 
     void Balancing(){
-        DynamicArray<Info>* arr =RoundTree(root);
+        DynamicArray<Info> arr;
+        arr = RoundTree();
         BinaryTree<T, K> newtree;
-        Node* newroot =  arr->GetElement(arr->GetFilled()/2);
+
+        Node* newroot = new Node;
+        newroot->info = arr.GetElement(arr.GetFilled()/2);
+        newroot->right = nullptr;
+        newroot->left = nullptr;
+
         newtree.root = newroot;
-        for(int i = 0; i < arr->GetFilled(); i++){
-            if (i == arr->GetFilled()/2)
+
+        for(int i = 0; i < arr.GetFilled(); i++){
+            if (i == arr.GetFilled()/2)
                 continue;
 
-            newtree.AddNote((arr->GetElement(i)).key, (arr->GetElement(i)).item);
+            newtree.AddNote((arr.GetElement(i)).key, (arr.GetElement(i)).item);
         }
         //удаление дерева
         root = newtree.GetRoot();

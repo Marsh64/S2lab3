@@ -56,7 +56,7 @@ void PrintBinaryTreeBeauty(BinaryTree<T, K> tree, int prob){
 
     for (int i = 0; i < prob; i++)
         cout << "  ";
-    cout << root->info.key;
+    cout << root->info.key << endl;
 
     BinaryTree<T, K> treeLeft (root->left);
     PrintBinaryTreeBeauty(treeLeft, prob + 1);
