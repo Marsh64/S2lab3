@@ -14,6 +14,8 @@ private:
         if (parent == 0)
             return 1;
 
+        if (parent == child)
+            return 0;
 
         while (child >= parent){
             if (child == parent){
@@ -27,6 +29,7 @@ private:
     }
 public:
     class IndexOutOfRange{};
+    class WrongItem{};
 
     HeapArray(){
         HeapSize = 0;
@@ -44,6 +47,9 @@ public:
         i = HeapSize;
         parent = (i - 1)/2;
         heap[i] = item;
+
+        if (SearchElement(item))
+            throw WrongItem();
 
         while (true){
             if (heap[parent] >= heap[i]){
@@ -82,7 +88,7 @@ public:
         left = 2 * i + 1;
         right = 2 * i + 2;
         if (left < HeapSize){
-            if(heap[i] < heap[left]){
+            if(heap[i] <= heap[left]){
                 temp = heap[left];
                 heap[left] = heap[i];
                 heap[i] = temp;
@@ -90,7 +96,7 @@ public:
             }
         }
         if (right < HeapSize){
-            if (heap[i] < heap[right]){
+            if (heap[i] <= heap[right]){
                 temp = heap[right];
                 heap[right] = heap[i];
                 heap[i] = temp;
@@ -109,10 +115,10 @@ public:
         //delete heap[HeapSize - 1];
         HeapSize --;
 
-        if (key == 0){
-            MaxHeapify(key);
-        }else{
-            MaxHeapify((key - 1)/2);
+        for (int j = 0 ;j < GetLevels(); j++){
+            for (int k = 0; k < HeapSize; k++){
+                MaxHeapify(k);
+            }
         }
     }
     HeapArray<T>* GetTree(T searched){
@@ -128,7 +134,7 @@ public:
             auto* newHeaparr1 = new T[HeapSize];
             int newHeap1size = 1;
             newHeaparr1[0] = searched;
-            for (int i = k; i < HeapSize; i++){
+            for (int i = k + 1; i < HeapSize; i++){
                 if (IsParent(k, i) == 1){
                     newHeaparr1[newHeap1size] = heap[i];
                     newHeap1size++;
@@ -136,11 +142,11 @@ public:
             }
 
             T* newHeaparr = new T[newHeap1size];
-            for (int i = 1; i < newHeap1size; i ++){
+            for (int i = 0; i < newHeap1size; i ++){
                 newHeaparr[i] = newHeaparr1[i];
             }
 
-            HeapArray<T>* newheap;
+            auto* newheap = new HeapArray<T>;
             newheap->heap = newHeaparr;
             newheap->HeapSize = newHeap1size;
             newheap->SIZE = SIZE;
@@ -167,10 +173,32 @@ public:
         return HeapSize;
 }
 
-    void DeleteHeapArray(){
-        delete[] heap;
-        HeapSize = 0;
-        SIZE = 0;
+    int GetLevels(){
+        int levels = 0;
+        int i = HeapSize;
+
+        if (i == 0)
+            return 0;
+
+        while (i != 0){
+            levels++;
+            i = (i - 1)/2;
+        }
+
+        return levels;
+    }
+    int GetAmountOfParent(int key){
+        int parents = 0;
+
+        if (key == 0)
+            return 0;
+
+        while (key != 0){
+            parents++;
+            key = (key - 1)/2;
+        }
+
+        return parents;
     }
 
 

@@ -150,6 +150,7 @@ void functionBinaryTreeTyped(DynamicArray<BinaryTree<T, K>> *Arr){
                 break;
         }
     }
+
 }
 
 template<class T, class K>

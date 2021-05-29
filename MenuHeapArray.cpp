@@ -253,12 +253,33 @@ void PrintHeapArrayMassive(HeapArray<T> heap){
 
 template<class T>
 void PrintHeapArrayBeauty(HeapArray<T> heap){
+    int levels = heap.GetLevels();
+    int levelnow = -1;
+
     for (int i = 0; i < heap.GetHeapSize(); i++){
-        cout << heap.FindElement(i) << "  ";
+        int parents = heap.GetAmountOfParent(i);
+        if (parents > levelnow){
+
+            if (levelnow == -1)
+                levelnow =parents;
+            else{
+                cout << endl;
+                levelnow = parents;
+            }
+        }
+
+        int prob = 1;
+        for (int j = 0; j < levels - parents; j++)
+            prob *= 2;
+
+        for (int k = 0; k < prob; k++)
+            cout << " ";
+
+        cout << heap.FindElement(i);
     }
 
     cout << endl;
-}//TODO пееределать
+}
 
 
 

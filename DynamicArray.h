@@ -12,11 +12,12 @@ public:
     };
 
     //Создание объекта
-    DynamicArray() {
+    DynamicArray(){
         array = nullptr;
         size = 0;
         filled = 0;
     }
+
 
     explicit DynamicArray(int newSize) {
         if (newSize < 0) { newSize = 0; }
@@ -43,6 +44,11 @@ public:
 
     //Операции
     void Append(T item) {
+        if (filled < 0 || filled > size) {
+            filled = 0;
+            size = 0;
+        }
+
         if (filled == size) {
             Resize(100);
         }
@@ -50,6 +56,7 @@ public:
         array[filled] = item;
         filled += 1;
     };
+
     void Resize(int newSize) {
         if (newSize < 0) { throw IndexOutOfRange(); }
 
@@ -109,6 +116,16 @@ public:
         filled = dynamicArray.GetFilled();
         for (int i = 0; i < filled; i++){
             array[i] = dynamicArray.array[i];
+        }
+        return *this;
+    }
+
+    DynamicArray<T>* &operator = (DynamicArray<T>* dynamicArray) {
+        Resize(dynamicArray->GetSize());
+        size = dynamicArray->GetSize();
+        filled = dynamicArray->GetFilled();
+        for (int i = 0; i < filled; i++){
+            array[i] = dynamicArray->array[i];
         }
         return *this;
     }

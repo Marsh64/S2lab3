@@ -42,13 +42,6 @@ private:
         return Demo;
     }
 
-    /*
-    BinaryTree<T, K>* &operator = (Node* tree) {
-        this->root = tree;
-        return *this;
-    }
-     */
-
     Node* root;
 
     void DeleteElementFirst(Node* temp, Node* temparent){
@@ -96,7 +89,27 @@ private:
             RoundTree(tree->right, arr);
         }
     }
+    int containTree(Node* tree, Node* contree){
+        if (tree == contree)
+            return 1;
 
+        if (contree == nullptr)
+            return 1;
+
+        if (tree == nullptr)
+            return 0;
+
+        if (tree->info.key != contree->info.key || tree->info.item != contree->info.item)
+            return 0;
+
+        if (not(containTree(tree->left, contree->left)))
+            return 0;
+
+        if (not(containTree(tree->right, contree->right)))
+            return 0;
+
+        return 1;
+    }
 
 public:
     class WrongKey{};
@@ -129,7 +142,8 @@ public:
                 } else if (key > ptr->info.key) {
                     par = ptr;
                     ptr = ptr->right;
-                }
+                }else
+                    throw WrongKey();
             }
             if (key < par->info.key)
                 par->left = newnode;
@@ -137,7 +151,6 @@ public:
                 par->right = newnode;
         }
     }
-
     Node* GetRoot(){
         return root;
     }
@@ -227,13 +240,12 @@ public:
             return newtree;
         }else
             throw WrongKey();
-    }//поддерево по ключу
+    }//возвращает поддерево по ключу
     DynamicArray<Info>& RoundTree(){
         auto* arr = new DynamicArray<Info>;
         RoundTree(root, arr);
         return *arr;
-    }
-
+    }//возвращает массив с обходом
     int isTree(const BinaryTree<T, K>& tree){
         if (root == tree.root)
             return 1;
@@ -252,25 +264,27 @@ public:
 
         return 1;
     }//Сравнивает дерево
-
     int ContainTree(const BinaryTree<T, K>& tree){
         if (tree.root == nullptr)
             return 1;
 
-        if (root == tree.root)
+        if (root== tree.root)
             return 1;
 
         if (root == nullptr)
             return 0;
 
-        if (root->info.key == tree.root->info.key)
-            return isTree(tree);
+        if (root->info.key == tree.root->info.key) {
+            return containTree(root, tree.root);
+        }
 
-        if (tree.root->info.key < root->info.key)
+        if (tree.root->info.key < root->info.key) {
             return BinaryTree<T, K>(root->left).ContainTree(tree);
-        else
+        }
+        else {
             return BinaryTree<T, K>(root->right).ContainTree(tree);
-    }
+        }
+    }//проверяет дерево на вхождение
 
     /*
     int ContainTree(BinaryTree<T, K> tree, BinaryTree<T, K> searched){
@@ -331,9 +345,23 @@ public:
 
             newtree.AddNote((arr.GetElement(i)).key, (arr.GetElement(i)).item);
         }
-        //удаление дерева
+
         root = newtree.GetRoot();
     }
+    void DeleteBinaryTree(){
+        if(root == nullptr)
+            return;
+
+        if (root->left != nullptr)
+            BinaryTree<T, K>(root->left).DeleteBinaryTree();
+
+        if (root->right != nullptr)
+            BinaryTree<T, K>(root->right).DeleteBinaryTree();
+
+        delete root;
+        root = nullptr;
+    }
+
 
 };
 
