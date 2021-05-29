@@ -18,6 +18,7 @@ private:
         while (child >= parent){
             if (child == parent){
                 temp = 1;
+                break;
             }
             child = (child - 1)/2;
         }
@@ -26,6 +27,7 @@ private:
     }
 public:
     class IndexOutOfRange{};
+
     HeapArray(){
         HeapSize = 0;
         heap = new T[SIZE];
@@ -63,7 +65,7 @@ public:
 
         return heap[key];
     }
-    int FindElementBool (int item){
+    int SearchElement (const T& item){
         int temp = 0;
         for (int i = 0; i < HeapSize; i++){
             if (item == heap[i])
@@ -75,7 +77,8 @@ public:
         return temp;
     }
     void MaxHeapify(int i){
-        int right, left, temp;
+        int right, left;
+        T temp;
         left = 2 * i + 1;
         right = 2 * i + 2;
         if (left < HeapSize){
@@ -120,8 +123,9 @@ public:
                 break;
             }
         }//в k будет находиться индекс искомого элемента
+
         if (k != -1){
-            T* newHeaparr1 = new T[HeapSize];
+            auto* newHeaparr1 = new T[HeapSize];
             int newHeap1size = 1;
             newHeaparr1[0] = searched;
             for (int i = k; i < HeapSize; i++){
@@ -131,7 +135,7 @@ public:
                 }
             }
 
-            T* newHeaparr = new T[newHeaparr1];
+            T* newHeaparr = new T[newHeap1size];
             for (int i = 1; i < newHeap1size; i ++){
                 newHeaparr[i] = newHeaparr1[i];
             }
@@ -140,19 +144,33 @@ public:
             newheap->heap = newHeaparr;
             newheap->HeapSize = newHeap1size;
             newheap->SIZE = SIZE;
+
+            //удаление
+            delete[] newHeaparr1;
+
             return newheap;
         }else
             return nullptr;
-    }//вернет указатель на массив поддерева в начале которого лежит число вершин
+    }
     int ContainTree(HeapArray<T> searched){
         if (searched.HeapSize > HeapSize)
             return 0;
 
         int temp = 1;
-        for (T* itm : searched.heap){
-            temp *= FindElementBool(&itm);
+        for (int i = 0; i < searched.HeapSize; i++){
+            temp *= SearchElement(heap[i]);
         }
+
         return temp;
+    }
+    int GetHeapSize(){
+        return HeapSize;
+}
+
+    void DeleteHeapArray(){
+        delete[] heap;
+        HeapSize = 0;
+        SIZE = 0;
     }
 
 
